@@ -29,7 +29,9 @@ esp_err_t init_sd_spi() {
     ret = spi_bus_initialize(host.slot, &buscfg, SPI_DMA_CH_AUTO);
     if (ret != ESP_OK) {
         // printf("Error inicializando el bus SPI: %d\n", ret);
-        lcd_print_string_at(18,3,"E1");
+        
+        // TODO lcd_print_string_at external call
+        // lcd_print_string_at(18,3,"E1");
         error_sd_spi = 1;
         return ret;
     }
@@ -53,60 +55,74 @@ esp_err_t init_sd_spi() {
     if (ret != ESP_OK) {
         if (ret == ESP_FAIL) {
             //printf("Error: Falló montar el sistema de archivos.\n");
-            lcd_print_string_at(18,3,"E2");
+            
+            // TODO lcd_print_string_at external call
+            // lcd_print_string_at(18,3,"E2");
+            
             error_sd_spi = 2;
         } else {
             // printf("Error: Falló inicializar la tarjeta SD (%s).\n", esp_err_to_name(ret));
-            lcd_print_string_at(18,3,"E3");
+            
+            // TODO lcd_print_string_at external call
+            // lcd_print_string_at(18,3,"E3");
+
             error_sd_spi = 3;
         }
         return ret;
     }
     //sdmmc_card_print_info(stdout, card);
-    rtc_data data = rtc_read();
-    snprintf(BufferRtcI2C, 25, "%02d-%02d-%02d_%02d-%02d-%02d", data.year,data.month, data.day_of_month, data.hours, data.minutes, data.seconds);
-    strcpy(filename,mount_point);
-    strcat(filename,"/");
-    strcat(filename, BufferRtcI2C);
-    strcat(filename, ".txt");
+    
+    // TODO rtc_read external call
+    // rtc_data data = rtc_read();
+    // snprintf(BufferRtcI2C, 25, "%02d-%02d-%02d_%02d-%02d-%02d", data.year,data.month, data.day_of_month, data.hours, data.minutes, data.seconds);
+    
+    // strcpy(filename,mount_point);
+    // strcat(filename,"/");
+    // strcat(filename, BufferRtcI2C);
+    // strcat(filename, ".txt");
 
 
     char buffer[50];
     f = fopen(filename, "a");
     if (f == NULL) {
-        lcd_print_string_at(18, 3, "E4");
+        
+        // TODO lcd_print_string_at external call
+        // lcd_print_string_at(18, 3, "E4");
+
         error_sd_spi = 4;
         return ESP_FAIL;
     }
     
-    sprintf(buffer, "---------------------------------------\n");      
-    fwrite(buffer, sizeof(char),strlen(buffer), f);
-    sprintf(buffer, "[DATE]\n%02d-%02d-%02d %02d:%02d:%02d\n",data.year,data.month, data.day_of_month, data.hours, data.minutes, data.seconds);      
-    fwrite(buffer, sizeof(char), strlen(buffer), f);
-    sprintf(buffer, "---------------------------------------\n");      
-    fwrite(buffer, sizeof(char),strlen(buffer), f);
-    sprintf(buffer, "[TRIGGER THRESHOLD]\n%05f => %llu\n",40e6/MAIN_PARAMETRERS.threshold , MAIN_PARAMETRERS.threshold);      
-    fwrite(buffer, sizeof(char), strlen(buffer), f);
-    sprintf(buffer, "---------------------------------------\n");      
-    fwrite(buffer, sizeof(char),strlen(buffer), f);
-    sprintf(buffer, "[DRIFT THRESHOLD]\n%05f\n", MAIN_PARAMETRERS.drift);      
-    fwrite(buffer, sizeof(char), strlen(buffer), f);
-    sprintf(buffer, "---------------------------------------\n");      
-    fwrite(buffer, sizeof(char),strlen(buffer), f);
-    sprintf(buffer, "[TRIGGER THRESHOLD TIME]\n%05f => %llu\n", 40e6/MAIN_PARAMETRERS.threshold_time,MAIN_PARAMETRERS.threshold_time);      
-    fwrite(buffer, sizeof(char), strlen(buffer), f);
-    sprintf(buffer, "---------------------------------------\n");      
-    fwrite(buffer, sizeof(char),strlen(buffer), f);
-    sprintf(buffer, "[TRIGGER DRIFT TIME]\n%05f => %llu\n", 40e6/MAIN_PARAMETRERS.drift_time,MAIN_PARAMETRERS.drift_time);      
-    fwrite(buffer, sizeof(char), strlen(buffer), f);
-    sprintf(buffer, "---------------------------------------\n");      
-    fwrite(buffer, sizeof(char),strlen(buffer), f);
-    sprintf(buffer, "[DISPLAY TIME]\n%05f => %llu\n", 40e6/MAIN_PARAMETRERS.display_time,MAIN_PARAMETRERS.display_time);      
-    fwrite(buffer, sizeof(char), strlen(buffer), f);
-    sprintf(buffer, "---------------------------------------\n[DATA]\n");      
-    fwrite(buffer, sizeof(char),strlen(buffer), f);
-    fclose(f);
-    lcd_print_string_at(18,3,"SD");
+    // TODO: Create function for write into SD , just recive a char* , external lcd_print_string_at
+
+    // sprintf(buffer, "---------------------------------------\n");      
+    // fwrite(buffer, sizeof(char),strlen(buffer), f);
+    // sprintf(buffer, "[DATE]\n%02d-%02d-%02d %02d:%02d:%02d\n",data.year,data.month, data.day_of_month, data.hours, data.minutes, data.seconds);      
+    // fwrite(buffer, sizeof(char), strlen(buffer), f);
+    // sprintf(buffer, "---------------------------------------\n");      
+    // fwrite(buffer, sizeof(char),strlen(buffer), f);
+    // sprintf(buffer, "[TRIGGER THRESHOLD]\n%05f => %llu\n",40e6/MAIN_PARAMETRERS.threshold , MAIN_PARAMETRERS.threshold);      
+    // fwrite(buffer, sizeof(char), strlen(buffer), f);
+    // sprintf(buffer, "---------------------------------------\n");      
+    // fwrite(buffer, sizeof(char),strlen(buffer), f);
+    // sprintf(buffer, "[DRIFT THRESHOLD]\n%05f\n", MAIN_PARAMETRERS.drift);      
+    // fwrite(buffer, sizeof(char), strlen(buffer), f);
+    // sprintf(buffer, "---------------------------------------\n");      
+    // fwrite(buffer, sizeof(char),strlen(buffer), f);
+    // sprintf(buffer, "[TRIGGER THRESHOLD TIME]\n%05f => %llu\n", 40e6/MAIN_PARAMETRERS.threshold_time,MAIN_PARAMETRERS.threshold_time);      
+    // fwrite(buffer, sizeof(char), strlen(buffer), f);
+    // sprintf(buffer, "---------------------------------------\n");      
+    // fwrite(buffer, sizeof(char),strlen(buffer), f);
+    // sprintf(buffer, "[TRIGGER DRIFT TIME]\n%05f => %llu\n", 40e6/MAIN_PARAMETRERS.drift_time,MAIN_PARAMETRERS.drift_time);      
+    // fwrite(buffer, sizeof(char), strlen(buffer), f);
+    // sprintf(buffer, "---------------------------------------\n");      
+    // fwrite(buffer, sizeof(char),strlen(buffer), f);
+    // sprintf(buffer, "[DISPLAY TIME]\n%05f => %llu\n", 40e6/MAIN_PARAMETRERS.display_time,MAIN_PARAMETRERS.display_time);      
+    // fwrite(buffer, sizeof(char), strlen(buffer), f);
+    // sprintf(buffer, "---------------------------------------\n[DATA]\n");      
+    // fwrite(buffer, sizeof(char),strlen(buffer), f);
+    // fclose(f);
+    // lcd_print_string_at(18,3,"SD");
     error_sd_spi = 0;
     return ESP_OK;
 }
@@ -141,7 +157,10 @@ void append_multiple_to_file(uint64_t* data, size_t count) {
     
     f = fopen(filename, "a");
     if (f == NULL) {
-        lcd_print_string_at(18, 3, "E4");
+
+        // TODO lcd_print_string_at external call
+        // lcd_print_string_at(18, 3, "E4");
+
         error_sd_spi = 4;
         return;
     }

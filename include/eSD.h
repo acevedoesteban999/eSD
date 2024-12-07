@@ -7,7 +7,6 @@
 #include "esp_log.h"
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
-#include "lcd_i2c.h"
 #include <string.h>
 
 // Definición de pines
