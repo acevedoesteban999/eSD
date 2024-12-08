@@ -82,7 +82,7 @@ esp_err_t init_sd_spi() {
     // strcat(filename, ".txt");
 
 
-    char buffer[50];
+    // char buffer[50];
     f = fopen(filename, "a");
     if (f == NULL) {
         
