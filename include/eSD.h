@@ -33,13 +33,13 @@ extern char SD_STR[3];
 // Prototipos de funciones
 esp_err_t init_sd_spi();
 
-void append_multiple_to_file(uint64_t* data, size_t count);
-
 void sd_add_data(uint64_t data);
 
-bool sd_check_trigger();
+int sd_check_trigger();
 
 int uint64_to_str(uint64_t num, char *buffer, int offset);
+
+void append_multiple_to_file(char *filename, uint64_t *data, size_t count);
 
 void sd_open(char *filename);
 

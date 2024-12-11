@@ -2,7 +2,7 @@
 
 int error_sd_spi = -1;
 char SD_STR[3] = "E?";
-char filename[40] = "";
+char *FILENAME;
 TaskHandle_t task_sd_spi_handle = NULL;
 uint64_t SD_BUFFER[MAX_BUFF_SD + 5]; 
 uint64_t SD_BUFFER_COPY[MAX_BUFF_SD + 5]; 
@@ -68,13 +68,14 @@ esp_err_t init_sd_spi() {
     return ESP_OK;
 }
 
-
+//Open and Set Filename 
 void sd_open(char*filename){
 
     f = fopen(filename, "a");
     if (f == NULL) {
         error_sd_spi = 4;
     }
+    FILENAME = filename;
 }
 
 void sd_close(){
@@ -82,7 +83,8 @@ void sd_close(){
 }
 
 void sd_write_without_open(char*buffer){
-    fwrite(buffer, sizeof(char),strlen(buffer), f);
+    if(!has_error_sd_spi())
+        fwrite(buffer, sizeof(char),strlen(buffer), f);
 }
 
 bool has_error_sd_spi(){
@@ -115,11 +117,12 @@ int uint64_to_str(uint64_t num, char* buffer,int offset) {
     return strlen;
 }
 
-void append_multiple_to_file(uint64_t* data, size_t count) {
+void append_multiple_to_file(char*filename,uint64_t* data, size_t count) {
     
     f = fopen(filename, "a");
     if (f == NULL) {
         error_sd_spi = 4;
+        strcpy(SD_STR,"E4");
         return;
     }
 
@@ -164,24 +167,33 @@ void sd_add_data(uint64_t data) {
 }
 
 void _task_trigger_sd(void* arg){
-    append_multiple_to_file(&SD_BUFFER_COPY,count_buff_sd_cpy);
+    append_multiple_to_file(FILENAME,&SD_BUFFER_COPY,count_buff_sd_cpy);
     vTaskDelete(NULL);
 }
 
-bool sd_check_trigger(){
-    if (has_error_sd_spi()) 
-        return false;
+
+/*
+RETURN:
+1 ok 
+0 no
+-1 error
+*/
+int sd_check_trigger(){
+    if (has_error_sd_spi()) {
+        return -1;
+    }
     
     if (count_buff_sd >= MAX_BUFF_SD) {
         if(task_sd_spi_handle != NULL)
             while (eTaskGetState(task_sd_spi_handle) == eRunning)
                 vTaskDelay(pdMS_TO_TICKS(1));
         memcpy(SD_BUFFER_COPY, SD_BUFFER, count_buff_sd * sizeof(uint64_t));
+        
         count_buff_sd_cpy = count_buff_sd;
         count_buff_sd = 0;
         xTaskCreatePinnedToCore(_task_trigger_sd, "xtask_sd", 5000, NULL, 15, &task_sd_spi_handle,1);
-        return true;
+        return 1;
     }
-    return false;
+    return 0;
     
 }
