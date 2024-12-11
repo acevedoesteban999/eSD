@@ -20,14 +20,6 @@
 #define SD_CORE 1
 #define MOUNT_POINT "/sdcard"
 
-enum SD_PARAMETERS{
-    TRIGGER_THRESHOLD,
-    WARNING_THRESHOLD,
-    TRIGGER_DRIFT,
-    WARNING_DRIFT,
-    INVALID_VALUE,
-};
-
 extern char SD_STR[3];
 
 // Prototipos de funciones
