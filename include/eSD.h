@@ -17,27 +17,36 @@
 #define SPI_MAX_FREC_KHZ 25000
 #define MAX_BUFF_SD 256
 #define BUFFER_SIZE 10 * MAX_BUFF_SD
+#define SD_CORE 1
+#define MOUNT_POINT "/sdcard"
+
+enum SD_PARAMETERS{
+    TRIGGER_THRESHOLD,
+    WARNING_THRESHOLD,
+    TRIGGER_DRIFT,
+    WARNING_DRIFT,
+    INVALID_VALUE,
+};
+
+extern char SD_STR[3];
 
 // Prototipos de funciones
 esp_err_t init_sd_spi();
-void write_data_to_sd(const char* filename, const char* data);
-void append_to_file(const char* filename, const char* data);
+
 void append_multiple_to_file(uint64_t* data, size_t count);
 
-void append_multiple_to_file1(uint64_t *data, size_t count);
+void sd_add_data(uint64_t data);
+
+bool sd_check_trigger();
 
 int uint64_to_str(uint64_t num, char *buffer, int offset);
 
+void sd_open(char *filename);
+
+void sd_close();
+
+void sd_write_without_open(char *buffer);
+
 bool has_error_sd_spi();
 
-void add_data_sd_spi(uint64_t data);
-
-void check_data_sd_spi();
-
-void task_append_to_multiple_to_file(void *arg);
-
-void append_multiple_to_file2(uint64_t *data, size_t count);
-
-void append_multiple_to_file3(uint64_t *data, size_t count);
-
-int uint64_to_str1(uint64_t num, char *buffer);
+int get_error_sd_spi();
