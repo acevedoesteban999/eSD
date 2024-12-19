@@ -95,24 +95,27 @@ int get_error_sd_spi(){
     return error_sd_spi;
 }
 
-int uint64_to_str(uint64_t num, char* buffer,int offset) {
-    char*p = buffer;
+int uint64_to_str(uint64_t num, char* buffer, int offset) {
+    if (buffer == NULL) {
+        return -1;
+    }
+
+    char* p = buffer + offset;
     if (num == 0) {
-        *(p + offset) = '0';
-        p++;
+        *p = '0';
         return 1;
     }
 
-    char temp[6]; 
+    char temp[20];
     int ii = 0;
     while (num > 0) {
-        temp[ii++] = (num % 10) + '0'; 
-        num /= 10; 
+        temp[ii++] = (num % 10) + '0';
+        num /= 10;
     }
+
     int strlen = ii;
     while (ii > 0) {
-        *(p + offset) = temp[--ii];
-        p++;
+        *p++ = temp[--ii];
     }
     return strlen;
 }
