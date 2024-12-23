@@ -23,22 +23,22 @@
 extern char SD_STR[3];
 
 // Prototipos de funciones
-esp_err_t init_sd_spi();
+esp_err_t esd_init();
 
-void sd_add_data(uint64_t data);
+void esd_add_data(uint64_t data);
 
-int sd_check_trigger();
+int esd_check_trigger();
 
-int uint64_to_str(uint64_t num, char *buffer, int offset);
+int esd_uint64_to_str(uint64_t num, char *buffer, int offset);
 
-void append_multiple_to_file(char *filename, uint64_t *data, size_t count);
+void esd_append_multiple_to_file(char *filename, uint64_t *data, size_t count);
 
-void sd_open(char *filename);
+void esd_open(char *filename);
 
-void sd_close();
+void esd_close();
 
-void sd_write_without_open(char *buffer);
+void esd_write_without_open(char *buffer);
 
-bool has_error_sd_spi();
+bool esd_has_error();
 
-int get_error_sd_spi();
+int esd_get_error();

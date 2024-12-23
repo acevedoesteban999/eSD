@@ -10,7 +10,7 @@ int count_buff_sd = 0;
 int count_buff_sd_cpy = 0;
 FILE* f;
 
-esp_err_t init_sd_spi() {
+esp_err_t esd_init() {
     // Definir los pines SPI
     esp_err_t ret;
     sdmmc_host_t host = SDSPI_HOST_DEFAULT();
@@ -69,7 +69,7 @@ esp_err_t init_sd_spi() {
 }
 
 //Open and Set Filename 
-void sd_open(char*filename){
+void esd_open(char*filename){
 
     f = fopen(filename, "a");
     if (f == NULL) {
@@ -78,24 +78,24 @@ void sd_open(char*filename){
     FILENAME = filename;
 }
 
-void sd_close(){
+void esd_close(){
     fclose(f);
 }
 
-void sd_write_without_open(char*buffer){
-    if(!has_error_sd_spi())
+void esd_write_without_open(char*buffer){
+    if(!esd_has_error())
         fwrite(buffer, sizeof(char),strlen(buffer), f);
 }
 
-bool has_error_sd_spi(){
+bool esd_has_error(){
     return error_sd_spi != 0;
 }
 
-int get_error_sd_spi(){
+int esd_get_error(){
     return error_sd_spi;
 }
 
-int uint64_to_str(uint64_t num, char* buffer, int offset) {
+int esd_uint64_to_str(uint64_t num, char* buffer, int offset) {
     if (buffer == NULL) {
         return -1;
     }
@@ -120,7 +120,7 @@ int uint64_to_str(uint64_t num, char* buffer, int offset) {
     return strlen;
 }
 
-void append_multiple_to_file(char*filename,uint64_t* data, size_t count) {
+void esd_append_multiple_to_file(char*filename,uint64_t* data, size_t count) {
     
     f = fopen(filename, "a");
     if (f == NULL) {
@@ -137,10 +137,10 @@ void append_multiple_to_file(char*filename,uint64_t* data, size_t count) {
         if (data[i] < 10)
             code_accum = code_accum * 10 + data[i];
         else {
-            count_buffer += uint64_to_str(data[i], &buffer,count_buffer );
+            count_buffer += esd_uint64_to_str(data[i], &buffer,count_buffer );
             if (code_accum){
                 buffer[count_buffer++] = ' ';
-                count_buffer += uint64_to_str(code_accum,buffer,count_buffer);
+                count_buffer += esd_uint64_to_str(code_accum,buffer,count_buffer);
                 buffer[count_buffer++] = '\n';
                 code_accum = 0;
             }
@@ -156,21 +156,21 @@ void append_multiple_to_file(char*filename,uint64_t* data, size_t count) {
     fclose(f);
 }
 
-void sd_add_data(uint64_t data) {
-    if (has_error_sd_spi()) 
+void esd_add_data(uint64_t data) {
+    if (esd_has_error()) 
         return;
     
     if(count_buff_sd < MAX_BUFF_SD){
         SD_BUFFER[count_buff_sd++] = data;
 
     }else{
-        sd_check_trigger();
-        sd_add_data(data);
+        esd_check_trigger();
+        esd_add_data(data);
     }
 }
 
 void _task_trigger_sd(void* arg){
-    append_multiple_to_file(FILENAME,&SD_BUFFER_COPY,count_buff_sd_cpy);
+    esd_append_multiple_to_file(FILENAME,&SD_BUFFER_COPY,count_buff_sd_cpy);
     vTaskDelete(NULL);
 }
 
@@ -181,8 +181,8 @@ RETURN:
 0 no
 -1 error
 */
-int sd_check_trigger(){
-    if (has_error_sd_spi()) {
+int esd_check_trigger(){
+    if (esd_has_error()) {
         return -1;
     }
     
