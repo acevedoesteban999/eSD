@@ -1,6 +1,6 @@
 #include "eSD.h"
 
-int error_sd_spi = -1;
+int error_esd = -1;
 char SD_STR[3] = "E?";
 char *FILENAME;
 TaskHandle_t task_sd_spi_handle = NULL;
@@ -30,7 +30,7 @@ esp_err_t esd_init() {
     ret = spi_bus_initialize(host.slot, &buscfg, SPI_DMA_CH_AUTO);
     if (ret != ESP_OK) {
         strcpy(SD_STR,"E1");
-        error_sd_spi = 1;
+        error_esd = 1;
         return ret;
     }
 
@@ -53,10 +53,10 @@ esp_err_t esd_init() {
     if (ret != ESP_OK) {
         if (ret == ESP_FAIL) {
             strcpy(SD_STR,"E2");
-            error_sd_spi = 2;
+            error_esd = 2;
         } else {
             strcpy(SD_STR,"E3");
-            error_sd_spi = 3;
+            error_esd = 3;
         }
         return ret;
     }
@@ -64,7 +64,7 @@ esp_err_t esd_init() {
     // sdmmc_card_print_info(stdout, card);
     
     strcpy(SD_STR,"SD");
-    error_sd_spi = 0;
+    error_esd = 0;
     return ESP_OK;
 }
 
@@ -73,7 +73,7 @@ void esd_open(char*filename){
 
     f = fopen(filename, "a");
     if (f == NULL) {
-        error_sd_spi = 4;
+        error_esd = 4;
     }
     FILENAME = filename;
 }
@@ -88,11 +88,11 @@ void esd_write_without_open(char*buffer){
 }
 
 bool esd_has_error(){
-    return error_sd_spi != 0;
+    return error_esd != 0;
 }
 
 int esd_get_error(){
-    return error_sd_spi;
+    return error_esd;
 }
 
 int esd_uint64_to_str(uint64_t num, char* buffer, int offset) {
@@ -124,7 +124,7 @@ void esd_append_multiple_to_file(char*filename,uint64_t* data, size_t count) {
     
     f = fopen(filename, "a");
     if (f == NULL) {
-        error_sd_spi = 4;
+        error_esd = 4;
         strcpy(SD_STR,"E4");
         return;
     }
