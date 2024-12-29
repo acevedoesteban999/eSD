@@ -164,7 +164,7 @@ void esd_add_data(uint64_t data) {
         SD_BUFFER[count_buff_sd++] = data;
 
     }else{
-        esd_check_trigger();
+        esd_force_trigger();
         esd_add_data(data);
     }
 }
@@ -187,6 +187,18 @@ int esd_check_trigger(){
     }
     
     if (count_buff_sd >= MAX_BUFF_SD) {
+        return esd_force_trigger();
+    }
+    return 0;
+    
+}
+
+int esd_force_trigger(){
+    if (esd_has_error()) {
+        return -1;
+    }
+    
+    if (count_buff_sd) {
         if(task_sd_spi_handle != NULL)
             while (eTaskGetState(task_sd_spi_handle) == eRunning)
                 vTaskDelay(pdMS_TO_TICKS(1));

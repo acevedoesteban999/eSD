@@ -29,6 +29,8 @@ void esd_add_data(uint64_t data);
 
 int esd_check_trigger();
 
+int esd_force_trigger();
+
 int esd_uint64_to_str(uint64_t num, char *buffer, int offset);
 
 void esd_append_multiple_to_file(char *filename, uint64_t *data, size_t count);
