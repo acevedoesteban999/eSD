@@ -22,18 +22,23 @@
 
 extern char SD_STR[3];
 
+typedef struct {
+    float value;
+    bool is_command;
+} esd_data;
+
 // Prototipos de funciones
 esp_err_t esd_init();
 
-void esd_add_data(uint64_t data);
+void esd_add_data(esd_data data);
 
 int esd_check_trigger();
 
 int esd_force_trigger();
 
-int esd_uint64_to_str(uint64_t num, char *buffer, int offset);
+int esd_float_to_str(float num, char *buffer, int offset);
 
-void esd_append_multiple_to_file(char *filename, uint64_t *data, size_t count);
+void esd_append_multiple_to_file(char *filename, esd_data *data, size_t count);
 
 void esd_open(char *filename);
 
