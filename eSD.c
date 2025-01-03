@@ -68,7 +68,6 @@ esp_err_t esd_init() {
     return ESP_OK;
 }
 
-//Open and Set Filename 
 void esd_open(char*filename){
 
     f = fopen(filename, "a");
@@ -128,8 +127,8 @@ int esd_float_to_str(float num, char* buffer, int offset) {
     *p++ = '.';
     strlen++;
 
-    // Convert fractional part
-    for (int i = 0; i < 6; i++) { // 6 decimal places
+    
+    for (int i = 0; i < 4; i++) { 
         frac_part *= 10;
         int digit = (int)frac_part;
         *p++ = digit + '0';
@@ -170,18 +169,15 @@ void esd_append_multiple_to_file(char* filename, esd_data* data, size_t count) {
     }
 
     char buffer[BUFFER_SIZE];
-    int code_accum = 0;
     int count_buffer = 0;
-    bool has_data = false;
     for (size_t i = 0; i < count; i++) {
         if (data[i].is_command) {
-            if(has_data == true){
-                buffer[count_buffer] = ' ';
-                count_buffer += esd_int_to_str(code_accum, buffer, count_buffer);
-                buffer[count_buffer++] = '\n';
-            }
-        } else {
-            has_data = true;
+            buffer[count_buffer-1] = ' ';
+            buffer[count_buffer] = ' ';
+            count_buffer += esd_int_to_str((int)data[i].value, buffer, count_buffer);
+            buffer[count_buffer++] = '\n';
+        } 
+        else {
             count_buffer += esd_float_to_str(data[i].value, buffer, count_buffer);
             buffer[count_buffer++] = '\n';
         }
