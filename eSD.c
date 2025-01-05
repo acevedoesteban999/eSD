@@ -4,8 +4,8 @@ int error_esd = -1;
 char SD_STR[3] = "E?";
 char *FILENAME;
 TaskHandle_t task_sd_spi_handle = NULL;
-uint64_t SD_BUFFER[MAX_BUFF_SD + 5]; 
-uint64_t SD_BUFFER_COPY[MAX_BUFF_SD + 5]; 
+esd_data SD_BUFFER[MAX_BUFF_SD + 5]; 
+esd_data SD_BUFFER_COPY[MAX_BUFF_SD + 5]; 
 int count_buff_sd = 0;
 int count_buff_sd_cpy = 0;
 FILE* f;
@@ -68,7 +68,6 @@ esp_err_t esd_init() {
     return ESP_OK;
 }
 
-//Open and Set Filename 
 void esd_open(char*filename){
 
     f = fopen(filename, "a");
@@ -95,7 +94,7 @@ int esd_get_error(){
     return error_esd;
 }
 
-int esd_uint64_to_str(uint64_t num, char* buffer, int offset) {
+int esd_float_to_str(float num, char* buffer, int offset) {
     if (buffer == NULL) {
         return -1;
     }
@@ -108,20 +107,60 @@ int esd_uint64_to_str(uint64_t num, char* buffer, int offset) {
 
     char temp[20];
     int ii = 0;
-    while (num > 0) {
-        temp[ii++] = (num % 10) + '0';
-        num /= 10;
+    int int_part = (int)num;
+    float frac_part = num - int_part;
+
+    if (int_part == 0) {
+        temp[ii++] = '0';
+    } else {
+        while (int_part > 0) {
+            temp[ii++] = (int_part % 10) + '0';
+            int_part /= 10;
+        }
     }
 
     int strlen = ii;
     while (ii > 0) {
         *p++ = temp[--ii];
     }
+
+    *p++ = '.';
+    strlen++;
+
+    
+    for (int i = 0; i < 4; i++) { 
+        frac_part *= 10;
+        int digit = (int)frac_part;
+        *p++ = digit + '0';
+        frac_part -= digit;
+        strlen++;
+    }
+
     return strlen;
 }
 
-void esd_append_multiple_to_file(char*filename,uint64_t* data, size_t count) {
-    
+int esd_int_to_str(int num, char* buffer, int offset) {
+    if (buffer == NULL) {
+        return -1;
+    }
+
+    char temp[12]; 
+    int ii = 0;
+
+    do {
+        temp[ii++] = (num % 10) + '0';
+        num /= 10;
+    } while (num > 0);
+
+    int strlen = ii;
+    while (ii > 0) {
+        buffer[offset++] = temp[--ii];
+    }
+
+    return strlen;
+}
+
+void esd_append_multiple_to_file(char* filename, esd_data* data, size_t count) {
     f = fopen(filename, "a");
     if (f == NULL) {
         error_esd = 4;
@@ -130,50 +169,42 @@ void esd_append_multiple_to_file(char*filename,uint64_t* data, size_t count) {
     }
 
     char buffer[BUFFER_SIZE];
-    uint64_t code_accum = 0;
     int count_buffer = 0;
-
     for (size_t i = 0; i < count; i++) {
-        if (data[i] < 10)
-            code_accum = code_accum * 10 + data[i];
+        if (data[i].is_command) {
+            buffer[count_buffer-1] = ' ';
+            buffer[count_buffer] = ' ';
+            count_buffer += esd_int_to_str((int)data[i].value, buffer, count_buffer);
+            buffer[count_buffer++] = '\n';
+        } 
         else {
-            count_buffer += esd_uint64_to_str(data[i], &buffer,count_buffer );
-            if (code_accum){
-                buffer[count_buffer++] = ' ';
-                count_buffer += esd_uint64_to_str(code_accum,buffer,count_buffer);
-                buffer[count_buffer++] = '\n';
-                code_accum = 0;
-            }
-            else
-                buffer[count_buffer++] = '\n';
+            count_buffer += esd_float_to_str(data[i].value, buffer, count_buffer);
+            buffer[count_buffer++] = '\n';
         }
     }
     if (count_buffer > 0) {
-        size_t aa=  fwrite(buffer, sizeof(char), count_buffer, f);
+        size_t aa = fwrite(buffer, sizeof(char), count_buffer, f);
     }
-    // sprintf(buffer, "---------------------------------------\n");      
-    // fwrite(buffer, sizeof(char),strlen(buffer), f);
     fclose(f);
 }
 
-void esd_add_data(uint64_t data) {
+void esd_add_data(esd_data data) {
     if (esd_has_error()) 
         return;
     
     if(count_buff_sd < MAX_BUFF_SD){
         SD_BUFFER[count_buff_sd++] = data;
 
-    }else{
-        esd_check_trigger();
+    } else {
+        esd_force_trigger();
         esd_add_data(data);
     }
 }
 
-void _task_trigger_sd(void* arg){
-    esd_append_multiple_to_file(FILENAME,&SD_BUFFER_COPY,count_buff_sd_cpy);
+void _task_trigger_sd(void* arg) {
+    esd_append_multiple_to_file(FILENAME, SD_BUFFER_COPY, count_buff_sd_cpy);
     vTaskDelete(NULL);
 }
-
 
 /*
 RETURN:
@@ -187,10 +218,22 @@ int esd_check_trigger(){
     }
     
     if (count_buff_sd >= MAX_BUFF_SD) {
+        return esd_force_trigger();
+    }
+    return 0;
+    
+}
+
+int esd_force_trigger() {
+    if (esd_has_error()) {
+        return -1;
+    }
+    
+    if (count_buff_sd) {
         if(task_sd_spi_handle != NULL)
             while (eTaskGetState(task_sd_spi_handle) == eRunning)
                 vTaskDelay(pdMS_TO_TICKS(1));
-        memcpy(SD_BUFFER_COPY, SD_BUFFER, count_buff_sd * sizeof(uint64_t));
+        memcpy(SD_BUFFER_COPY, SD_BUFFER, count_buff_sd * sizeof(esd_data));
         
         count_buff_sd_cpy = count_buff_sd;
         count_buff_sd = 0;
@@ -198,5 +241,4 @@ int esd_check_trigger(){
         return 1;
     }
     return 0;
-    
 }
