@@ -30,6 +30,8 @@ typedef struct {
 // Prototipos de funciones
 esp_err_t esd_init();
 
+void esd_open(char *filename, char *type);
+
 void esd_add_data(esd_data data);
 
 int esd_check_trigger();
@@ -40,11 +42,14 @@ int esd_float_to_str(float num, char *buffer, int offset);
 
 void esd_append_multiple_to_file(char *filename, esd_data *data, size_t count);
 
-void esd_open(char *filename);
 
 void esd_close();
 
-void esd_write_without_open(char *buffer);
+void esd_write_str_without_open(char *buffer);
+
+void esd_write_data_without_open(char *buffer, size_t size, size_t len);
+
+void esd_fflush();
 
 bool esd_has_error();
 

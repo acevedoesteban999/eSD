@@ -68,9 +68,9 @@ esp_err_t esd_init() {
     return ESP_OK;
 }
 
-void esd_open(char*filename){
+void esd_open(char*filename,char*type){
 
-    f = fopen(filename, "a");
+    f = fopen(filename, type);
     if (f == NULL) {
         error_esd = 4;
     }
@@ -81,9 +81,17 @@ void esd_close(){
     fclose(f);
 }
 
-void esd_write_without_open(char*buffer){
+void esd_write_str_without_open(char*buffer){
     if(!esd_has_error())
         fwrite(buffer, sizeof(char),strlen(buffer), f);
+}
+
+void esd_write_data_without_open(char*buffer,size_t size, size_t len){
+    if(!esd_has_error())
+        fwrite(buffer, size,len, f);
+}
+void esd_fflush(){
+    fflush(f);
 }
 
 bool esd_has_error(){

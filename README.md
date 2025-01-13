@@ -15,7 +15,7 @@ The eSD module is an implementation for handling SD card functionality on the ES
 - `esp_err_t esd_init()`: Initializes the SD card in SPI mode.
 - `void esd_open(char *filename)`: Opens a file for writing.
 - `void esd_close()`: Closes the currently open file.
-- `void esd_write_without_open(char *buffer)`: Writes data to the currently open file without reopening it.
+- `void esd_write_str_without_open(char *buffer)`: Writes data to the currently open file without reopening it.
 - `bool esd_has_error()`: Checks if there is an error with the SD card.
 - `int esd_get_error()`: Returns the error code for the SD card.
 - `void esd_add_data(uint64_t data)`: Adds data to the buffer for writing.
