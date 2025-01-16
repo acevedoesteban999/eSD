@@ -48,7 +48,7 @@ void esd_close();
 
 void esd_write_str_without_open(char *buffer);
 
-void esd_write_data_without_open(char *buffer, size_t size, size_t len);
+void esd_write_data_without_open(void * buffer, size_t size, size_t len);
 
 void esd_fflush();
 

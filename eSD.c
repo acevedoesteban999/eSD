@@ -86,7 +86,7 @@ void esd_write_str_without_open(char*buffer){
         fwrite(buffer, sizeof(char),strlen(buffer), esd_file);
 }
 
-void esd_write_data_without_open(char*buffer,size_t size, size_t len){
+void esd_write_data_without_open(void*buffer,size_t size, size_t len){
     if(!esd_has_error())
         fwrite(buffer, size,len, esd_file);
 }
@@ -191,7 +191,7 @@ void esd_append_multiple_to_file(char* filename, esd_data* data, size_t count) {
         }
     }
     if (count_buffer > 0) {
-        size_t aa = fwrite(buffer, sizeof(char), count_buffer, esd_file);
+        fwrite(buffer, sizeof(char), count_buffer, esd_file);
     }
     fclose(esd_file);
 }
