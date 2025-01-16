@@ -8,7 +8,7 @@ esd_data SD_BUFFER[MAX_BUFF_SD + 5];
 esd_data SD_BUFFER_COPY[MAX_BUFF_SD + 5]; 
 int count_buff_sd = 0;
 int count_buff_sd_cpy = 0;
-FILE* f;
+FILE* esd_file;
 
 esp_err_t esd_init() {
     // Definir los pines SPI
@@ -70,28 +70,28 @@ esp_err_t esd_init() {
 
 void esd_open(char*filename,char*type){
 
-    f = fopen(filename, type);
-    if (f == NULL) {
+    esd_file = fopen(filename, type);
+    if (esd_file == NULL) {
         error_esd = 4;
     }
     FILENAME = filename;
 }
 
 void esd_close(){
-    fclose(f);
+    fclose(esd_file);
 }
 
 void esd_write_str_without_open(char*buffer){
     if(!esd_has_error())
-        fwrite(buffer, sizeof(char),strlen(buffer), f);
+        fwrite(buffer, sizeof(char),strlen(buffer), esd_file);
 }
 
 void esd_write_data_without_open(char*buffer,size_t size, size_t len){
     if(!esd_has_error())
-        fwrite(buffer, size,len, f);
+        fwrite(buffer, size,len, esd_file);
 }
 void esd_fflush(){
-    fflush(f);
+    fflush(esd_file);
 }
 
 bool esd_has_error(){
@@ -169,8 +169,8 @@ int esd_int_to_str(int num, char* buffer, int offset) {
 }
 
 void esd_append_multiple_to_file(char* filename, esd_data* data, size_t count) {
-    f = fopen(filename, "a");
-    if (f == NULL) {
+    esd_file = fopen(filename, "a");
+    if (esd_file == NULL) {
         error_esd = 4;
         strcpy(SD_STR,"E4");
         return;
@@ -191,9 +191,9 @@ void esd_append_multiple_to_file(char* filename, esd_data* data, size_t count) {
         }
     }
     if (count_buffer > 0) {
-        size_t aa = fwrite(buffer, sizeof(char), count_buffer, f);
+        size_t aa = fwrite(buffer, sizeof(char), count_buffer, esd_file);
     }
-    fclose(f);
+    fclose(esd_file);
 }
 
 void esd_add_data(esd_data data) {

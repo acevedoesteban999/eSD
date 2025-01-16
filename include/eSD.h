@@ -21,6 +21,7 @@
 #define MOUNT_POINT "/sdcard"
 
 extern char SD_STR[3];
+extern FILE* esd_file;
 
 typedef struct {
     float value;
