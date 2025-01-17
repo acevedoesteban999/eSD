@@ -18,7 +18,7 @@
 #define MAX_BUFF_SD 256
 #define BUFFER_SIZE 10 * MAX_BUFF_SD
 #define SD_CORE 1
-#define MOUNT_POINT "/sdcard"
+#define ESD_MOUNT_POINT "/sdcard"
 
 extern char SD_STR[3];
 extern FILE* esd_file;
