@@ -9,62 +9,71 @@ esd_data SD_BUFFER_COPY[MAX_BUFF_SD + 5];
 int count_buff_sd = 0;
 int count_buff_sd_cpy = 0;
 FILE* esd_file;
+esd_gpio ESD_GPIO = ESD_DEFAULT_GPIO;
+
+void esd_set_gpio(esd_gpio gpio){
+    ESD_GPIO = gpio;
+}
 
 esp_err_t esd_init() {
-    // Definir los pines SPI
-    esp_err_t ret;
-    sdmmc_host_t host = SDSPI_HOST_DEFAULT();
-    host.max_freq_khz = SPI_MAX_FREC_KHZ;
+    if(esd_has_error()){
 
-    // Configurar el bus SPI para la tarjeta SD
-    spi_bus_config_t buscfg = {
-        .miso_io_num = PIN_NUM_MISO,
-        .mosi_io_num = PIN_NUM_MOSI,
-        .sclk_io_num = PIN_NUM_CLK,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
-
-    };
-
-    // Inicializar el bus SPI
-    ret = spi_bus_initialize(host.slot, &buscfg, SPI_DMA_CH_AUTO);
-    if (ret != ESP_OK) {
-        strcpy(SD_STR,"E1");
-        error_esd = 1;
-        return ret;
-    }
-
-    // Configurar el dispositivo SPI (microSD)
-    sdspi_device_config_t slot_config = SDSPI_DEVICE_CONFIG_DEFAULT();
-    slot_config.gpio_cs = PIN_NUM_CS; // Pin CS para microSD
-    slot_config.host_id = host.slot;
     
-    // Montar el sistema de archivos FAT
-    const char mount_point[] = "/sdcard";
-    esp_vfs_fat_sdmmc_mount_config_t mount_config = {
-        .format_if_mount_failed = false,
-        .max_files = 5,
-        .allocation_unit_size = 16 * 1024
-    };
+        // Definir los pines SPI
+        esp_err_t ret;
+        sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+        host.max_freq_khz = SPI_MAX_FREC_KHZ;
 
-    sdmmc_card_t* card;
-    ret = esp_vfs_fat_sdspi_mount(mount_point, &host, &slot_config, &mount_config, &card);
+        // Configurar el bus SPI para la tarjeta SD
+        spi_bus_config_t buscfg = {
+            .miso_io_num = ESD_GPIO.eSD_MISO,
+            .mosi_io_num = ESD_GPIO.eSD_MOSI,
+            .sclk_io_num = ESD_GPIO.eSD_SCLK,
+            .quadwp_io_num = -1,
+            .quadhd_io_num = -1,
 
-    if (ret != ESP_OK) {
-        if (ret == ESP_FAIL) {
-            strcpy(SD_STR,"E2");
-            error_esd = 2;
-        } else {
-            strcpy(SD_STR,"E3");
-            error_esd = 3;
+        };
+
+        // Inicializar el bus SPI
+        ret = spi_bus_initialize(host.slot, &buscfg, SPI_DMA_CH_AUTO);
+        if (ret != ESP_OK) {
+            strcpy(SD_STR,"E1");
+            error_esd = 1;
+            return ret;
         }
-        return ret;
-    }
 
-    // sdmmc_card_print_info(stdout, card);
-    
-    strcpy(SD_STR,"SD");
-    error_esd = 0;
+        sdspi_device_config_t slot_config = SDSPI_DEVICE_CONFIG_DEFAULT();
+        slot_config.gpio_cs = ESD_GPIO.eSD_CS;
+        slot_config.host_id = host.slot;
+        
+        const char mount_point[] = "/sdcard";
+        esp_vfs_fat_sdmmc_mount_config_t mount_config = {
+            .format_if_mount_failed = false,
+            .max_files = 5,
+            .allocation_unit_size = 16 * 1024
+        };
+
+        sdmmc_card_t* card;
+        ret = esp_vfs_fat_sdspi_mount(mount_point, &host, &slot_config, &mount_config, &card);
+
+        if (ret != ESP_OK) {
+            if (ret == ESP_FAIL) {
+                strcpy(SD_STR,"E2");
+                error_esd = 2;
+            } else {
+                strcpy(SD_STR,"E3");
+                error_esd = 3;
+            }
+            return ret;
+        }
+        
+        strcpy(SD_STR,"SD");
+        ESP_LOGI("", "eSD INIT MOSI: %u  MISO: %u CS: %u SCLK: %u", ESD_GPIO.eSD_MOSI,ESD_GPIO.eSD_MISO,ESD_GPIO.eSD_CS,ESD_GPIO.eSD_SCLK);
+   
+        error_esd = 0;
+        return ESP_OK;
+    }
+    ESP_LOGI("", "eSD enable yet: MOSI: %u  MISO: %u CS: %u SCLK: %u", ESD_GPIO.eSD_MOSI,ESD_GPIO.eSD_MISO,ESD_GPIO.eSD_CS,ESD_GPIO.eSD_SCLK);
     return ESP_OK;
 }
 
