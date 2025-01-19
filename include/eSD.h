@@ -10,23 +10,38 @@
 #include <string.h>
 
 // Definición de pines
-#define PIN_NUM_MISO 19
-#define PIN_NUM_MOSI 23
-#define PIN_NUM_CLK  18
-#define PIN_NUM_CS   5
 #define SPI_MAX_FREC_KHZ 25000
 #define MAX_BUFF_SD 256
 #define BUFFER_SIZE 10 * MAX_BUFF_SD
 #define SD_CORE 1
 #define ESD_MOUNT_POINT "/sdcard"
 
+#define ESD_DEFAULT_GPIO (esd_gpio) {\
+    .eSD_MISO = 19, \
+    .eSD_MOSI = 23, \
+    .eSD_CS = 5, \
+    .eSD_SCLK = 18, \
+}
+
+
 extern char SD_STR[3];
 extern FILE* esd_file;
+
+typedef struct{
+    unsigned char eSD_MISO;
+    unsigned char eSD_MOSI;
+    unsigned char eSD_SCLK;
+    unsigned char eSD_CS;
+}esd_gpio;
 
 typedef struct {
     float value;
     bool is_command;
 } esd_data;
+
+extern esd_gpio ESD_GPIO;
+
+void esd_set_gpio(esd_gpio gpio);
 
 // Prototipos de funciones
 esp_err_t esd_init();
