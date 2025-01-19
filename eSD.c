@@ -26,9 +26,9 @@ esp_err_t esd_init() {
 
         // Configurar el bus SPI para la tarjeta SD
         spi_bus_config_t buscfg = {
-            .miso_io_num = ESD_GPIO.eSD_MISO,
-            .mosi_io_num = ESD_GPIO.eSD_MOSI,
-            .sclk_io_num = ESD_GPIO.eSD_SCLK,
+            .miso_io_num = ESD_GPIO.MISO,
+            .mosi_io_num = ESD_GPIO.MOSI,
+            .sclk_io_num = ESD_GPIO.SCLK,
             .quadwp_io_num = -1,
             .quadhd_io_num = -1,
 
@@ -43,7 +43,7 @@ esp_err_t esd_init() {
         }
 
         sdspi_device_config_t slot_config = SDSPI_DEVICE_CONFIG_DEFAULT();
-        slot_config.gpio_cs = ESD_GPIO.eSD_CS;
+        slot_config.gpio_cs = ESD_GPIO.CS;
         slot_config.host_id = host.slot;
         
         const char mount_point[] = "/sdcard";
@@ -68,12 +68,12 @@ esp_err_t esd_init() {
         }
         
         strcpy(SD_STR,"SD");
-        ESP_LOGI("", "eSD INIT MOSI: %u  MISO: %u CS: %u SCLK: %u", ESD_GPIO.eSD_MOSI,ESD_GPIO.eSD_MISO,ESD_GPIO.eSD_CS,ESD_GPIO.eSD_SCLK);
+        ESP_LOGI("", "eSD INIT MOSI: %u  MISO: %u CS: %u SCLK: %u", ESD_GPIO.MOSI,ESD_GPIO.MISO,ESD_GPIO.CS,ESD_GPIO.SCLK);
    
         error_esd = 0;
         return ESP_OK;
     }
-    ESP_LOGI("", "eSD enable yet: MOSI: %u  MISO: %u CS: %u SCLK: %u", ESD_GPIO.eSD_MOSI,ESD_GPIO.eSD_MISO,ESD_GPIO.eSD_CS,ESD_GPIO.eSD_SCLK);
+    ESP_LOGI("", "eSD enable yet: MOSI: %u  MISO: %u CS: %u SCLK: %u", ESD_GPIO.MOSI,ESD_GPIO.MISO,ESD_GPIO.CS,ESD_GPIO.SCLK);
     return ESP_OK;
 }
 

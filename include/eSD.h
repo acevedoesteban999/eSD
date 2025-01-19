@@ -17,10 +17,10 @@
 #define ESD_MOUNT_POINT "/sdcard"
 
 #define ESD_DEFAULT_GPIO (esd_gpio) {\
-    .eSD_MISO = 19, \
-    .eSD_MOSI = 23, \
-    .eSD_CS = 5, \
-    .eSD_SCLK = 18, \
+    .MISO = 19, \
+    .MOSI = 23, \
+    .CS = 5, \
+    .SCLK = 18, \
 }
 
 
@@ -28,10 +28,10 @@ extern char SD_STR[3];
 extern FILE* esd_file;
 
 typedef struct{
-    unsigned char eSD_MISO;
-    unsigned char eSD_MOSI;
-    unsigned char eSD_SCLK;
-    unsigned char eSD_CS;
+    unsigned char MISO;
+    unsigned char MOSI;
+    unsigned char SCLK;
+    unsigned char CS;
 }esd_gpio;
 
 typedef struct {
