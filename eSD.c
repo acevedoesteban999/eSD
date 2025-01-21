@@ -46,16 +46,17 @@ esp_err_t esd_init() {
         slot_config.gpio_cs = ESD_GPIO.CS;
         slot_config.host_id = host.slot;
         
-        const char mount_point[] = "/sdcard";
+        const char mount_point[] = ESD_MOUNT_POINT;
+
         esp_vfs_fat_sdmmc_mount_config_t mount_config = {
             .format_if_mount_failed = false,
             .max_files = 5,
-            .allocation_unit_size = 16 * 1024
+            .allocation_unit_size = 16 * 1024,
         };
 
         sdmmc_card_t* card;
         ret = esp_vfs_fat_sdspi_mount(mount_point, &host, &slot_config, &mount_config, &card);
-
+        
         if (ret != ESP_OK) {
             if (ret == ESP_FAIL) {
                 strcpy(SD_STR,"E2");
@@ -69,7 +70,7 @@ esp_err_t esd_init() {
         
         strcpy(SD_STR,"SD");
         ESP_LOGI("", "eSD INIT MOSI: %u  MISO: %u CS: %u SCLK: %u", ESD_GPIO.MOSI,ESD_GPIO.MISO,ESD_GPIO.CS,ESD_GPIO.SCLK);
-   
+
         error_esd = 0;
         return ESP_OK;
     }
