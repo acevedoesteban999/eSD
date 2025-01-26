@@ -58,8 +58,9 @@ int esd_float_to_str(float num, char *buffer, int offset);
 
 void esd_append_multiple_to_file(char *filename, esd_data *data, size_t count);
 
-
 void esd_close();
+
+bool esd_delete_file(const char *filename);
 
 void esd_write_str_without_open(char *buffer);
 

@@ -91,6 +91,10 @@ void esd_close(){
     fclose(esd_file);
 }
 
+bool esd_delete_file(const char* filename){
+    return remove(filename) == 0;
+}
+
 void esd_write_str_without_open(char*buffer){
     if(!esd_has_error())
         fwrite(buffer, sizeof(char),strlen(buffer), esd_file);
