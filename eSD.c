@@ -83,6 +83,7 @@ void esd_open(char*filename,char*type){
     esd_file = fopen(filename, type);
     if (esd_file == NULL) {
         error_esd = 4;
+        strcpy(SD_STR,"E4");
     }
     FILENAME = filename;
 }
