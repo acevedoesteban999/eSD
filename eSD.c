@@ -19,12 +19,10 @@ esp_err_t esd_init() {
     if(esd_has_error()){
 
     
-        // Definir los pines SPI
         esp_err_t ret;
         sdmmc_host_t host = SDSPI_HOST_DEFAULT();
         host.max_freq_khz = SPI_MAX_FREC_KHZ;
 
-        // Configurar el bus SPI para la tarjeta SD
         spi_bus_config_t buscfg = {
             .miso_io_num = ESD_GPIO.MISO,
             .mosi_io_num = ESD_GPIO.MOSI,
@@ -34,7 +32,6 @@ esp_err_t esd_init() {
 
         };
 
-        // Inicializar el bus SPI
         ret = spi_bus_initialize(host.slot, &buscfg, SPI_DMA_CH_AUTO);
         if (ret != ESP_OK) {
             strcpy(SD_STR,"E1");
