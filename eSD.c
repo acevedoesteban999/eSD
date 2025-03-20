@@ -76,7 +76,8 @@ esp_err_t esd_init() {
 }
 
 void esd_open(char*filename,char*type){
-
+    if(esd_has_error())
+        return;
     esd_file = fopen(filename, type);
     if (esd_file == NULL) {
         error_esd = 4;
@@ -86,10 +87,14 @@ void esd_open(char*filename,char*type){
 }
 
 void esd_close(){
+    if(esd_has_error())
+        return;
     fclose(esd_file);
 }
 
 bool esd_delete_file(const char* filename){
+    if(esd_has_error())
+        return false;
     return remove(filename) == 0;
 }
 
@@ -181,6 +186,8 @@ int esd_int_to_str(int num, char* buffer, int offset) {
 }
 
 void esd_append_multiple_to_file(char* filename, esd_data* data, size_t count) {
+    if(esd_has_error())
+        return;
     esd_file = fopen(filename, "a");
     if (esd_file == NULL) {
         error_esd = 4;
@@ -222,6 +229,8 @@ void esd_add_data(esd_data data) {
 }
 
 void _task_trigger_sd(void* arg) {
+    if(esd_has_error())
+        vTaskDelete(NULL);
     esd_append_multiple_to_file(FILENAME, SD_BUFFER_COPY, count_buff_sd_cpy);
     vTaskDelete(NULL);
 }
