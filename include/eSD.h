@@ -17,10 +17,10 @@
 #define ESD_MOUNT_POINT "/sdcard"
 
 #define ESD_DEFAULT_GPIO (esd_gpio) {\
-    .MISO = 19, \
-    .MOSI = 23, \
-    .CS = 5, \
-    .SCLK = 18, \
+    .MISO = GPIO_NUM_19, \
+    .MOSI = GPIO_NUM_23, \
+    .CS = GPIO_NUM_5, \
+    .SCLK = GPIO_NUM_18, \
 }
 
 
